@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	encoded := message.SecretMessage
+	encoded := message.Secret
 	decoded, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		fmt.Println("decode error:", err)

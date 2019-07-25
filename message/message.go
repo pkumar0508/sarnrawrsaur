@@ -1,3 +1,3 @@
 package message
 
-const SecretMessage = First + Second
+const Secret = First + Second
