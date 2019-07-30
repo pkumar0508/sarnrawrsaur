@@ -1,19 +1,18 @@
-# FROM gcr.io/cloud-builders/go:latest
-FROM gcr.io/cloud-builders/go@sha256:101d584e440f2a7d0d2c96d2d9f64375cfb1e43916dcf9cd65dc12454cb8d3a9 as builder
-RUN apk update && apk add --no-cache git ca-certificates tzdata && update-ca-certificates
-RUN adduser -D -g '' appuser
+# gcloud container images describe mirror.gcr.io/library/golang:1.12
+FROM mirror.gcr.io/library/golang@sha256:b9edf5a27f9991d798a733ab25bc6e13dd5c66828b4bf821be07ac326948e61a as builder
 
-WORKDIR $GOPATH/src/pkumar0508/sarnrawrsaur/
+WORKDIR /workspace
 COPY . .
 RUN go mod download && go mod verify && go test ./...
-RUN GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o /go/bin/sarnrawrsaur
+RUN GOOS=linux GOARCH=amd64 go build -o /sarnrawrsaur
 
-FROM scratch
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=builder /etc/passwd /etc/passwd
-COPY --from=builder /go/bin/sarnrawrsaur /go/bin/sarnrawrsaur
+# gcloud container images describe mirror.gcr.io/alpine/git:latest
+FROM mirror.gcr.io/alpine/git@sha256:8f5659025d83a60e9d140123bb1b27f3c334578aef10d002da4e5848580f1a6c
+RUN apk add --no-cache ca-certificates
+COPY --from=builder /sarnrawrsaur /sarnrawrsaur
 
+RUN adduser -D -g '' appuser
 USER appuser
-EXPOSE 8080
-ENTRYPOINT ["/go/bin/sarnrawrsaur"]
+
+# EXPOSE 8080
+ENTRYPOINT ["/sarnrawrsaur"]
