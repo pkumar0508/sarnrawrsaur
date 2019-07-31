@@ -14,5 +14,5 @@ COPY --from=builder /sarnrawrsaur /sarnrawrsaur
 RUN adduser -D -g '' appuser
 USER appuser
 
-# EXPOSE 8080
+EXPOSE 8080
 ENTRYPOINT ["/sarnrawrsaur"]
