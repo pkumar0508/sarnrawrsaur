@@ -1,17 +1,21 @@
 package main
 
 import (
-	"encoding/base64"
-	"github.com/pkumar0508/sarnrawrsaur/message"
-	"fmt"
+    "fmt"
+    "log"
+    "net/http"
+    "os"
 )
 
+func handler(w http.ResponseWriter, r *http.Request) {
+    fmt.Fprintf(w, "Hi there, I love %s!\n", r.URL.Path[1:])
+}
+
 func main() {
-	encoded := message.Secret
-	decoded, err := base64.StdEncoding.DecodeString(encoded)
-	if err != nil {
-		fmt.Println("decode error:", err)
-		return
-	}
-	fmt.Println(string(decoded))
+    http.HandleFunc("/", handler)
+    addr := ":8080"
+    if port, ok := os.LookupEnv("PORT"); ok {
+	addr = ":" + port
+    }
+    log.Fatal(http.ListenAndServe(addr, nil))
 }
