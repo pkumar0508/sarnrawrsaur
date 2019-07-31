@@ -3,16 +3,15 @@ FROM mirror.gcr.io/library/golang@sha256:b9edf5a27f9991d798a733ab25bc6e13dd5c668
 
 WORKDIR /workspace
 COPY . .
+
 RUN go mod download && go mod verify && go test ./...
-RUN GOOS=linux GOARCH=amd64 go build -o /sarnrawrsaur
 
-# gcloud container images describe mirror.gcr.io/alpine/git:latest
-FROM mirror.gcr.io/alpine/git@sha256:8f5659025d83a60e9d140123bb1b27f3c334578aef10d002da4e5848580f1a6c
+# TODO: check if this line is the preferred build command for go 1.10+
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o server
+
+# TODO: fetch this image by digest for security
+FROM alpine
 RUN apk add --no-cache ca-certificates
-COPY --from=builder /sarnrawrsaur /sarnrawrsaur
+COPY --from=builder /workspace/server /server
 
-RUN adduser -D -g '' appuser
-USER appuser
-
-EXPOSE 8080
-ENTRYPOINT ["/sarnrawrsaur"]
+ENTRYPOINT ["/server"]
