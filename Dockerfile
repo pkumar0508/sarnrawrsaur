@@ -5,7 +5,7 @@ WORKDIR /workspace
 COPY . .
 
 RUN go mod download && go mod verify && go test ./...
-RUN GOOS=linux GOARCH=amd64 go build -o server
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o server
 
 # gcloud container images describe mirror.gcr.io/library/alpine:latest
 FROM mirror.gcr.io/library/alpine@sha256:57334c50959f26ce1ee025d08f136c2292c128f84e7b229d1b0da5dac89e9866
