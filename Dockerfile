@@ -5,12 +5,10 @@ WORKDIR /workspace
 COPY . .
 
 RUN go mod download && go mod verify && go test ./...
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -o server
 
-# TODO: check if this line is the preferred build command for go 1.10+
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o server
-
-# TODO: fetch this image by digest for security
-FROM alpine
+# gcloud container images describe mirror.gcr.io/library/alpine:latest
+FROM mirror.gcr.io/library/alpine@sha256:57334c50959f26ce1ee025d08f136c2292c128f84e7b229d1b0da5dac89e9866
 RUN apk add --no-cache ca-certificates
 COPY --from=builder /workspace/server /server
 
