@@ -1,3 +1,3 @@
-module github.com/pkumar0508/sarnrawrsaur
+module go.pzk.dev/sarnrawrsaur
 
 go 1.13
